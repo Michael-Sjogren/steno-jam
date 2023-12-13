@@ -1,12 +1,26 @@
 // raylib-zig (c) Nikolas Wipper 2023
-
+const std = @import("std");
 const rl = @import("raylib");
-const tileset = @import("dungeon_tileset.zig");
+const ts = @import("dungeon_tileset.zig");
 pub fn main() anyerror!void {
     // Initialization
     //--------------------------------------------------------------------------------------
     const screenWidth = 1920 / 2;
     const screenHeight = 1080 / 2;
+    var gpa = std.heap.GeneralPurposeAllocator(.{}){};
+
+    const alloc = gpa.allocator();
+
+    var canidates = try ts.getTileCandiates(alloc);
+
+    defer {
+        ts.freeTileCanidatesMap(&canidates);
+        const leak = gpa.detectLeaks();
+        if (leak) {
+            std.debug.print("Leaked", .{});
+        }
+        _ = gpa.deinit();
+    }
 
     rl.initWindow(screenWidth, screenHeight, "raylib-zig [core] example - basic window");
     defer rl.closeWindow(); // Close window and OpenGL context
@@ -37,7 +51,7 @@ pub fn main() anyerror!void {
         defer rl.endMode2D();
         //rl.drawTexture(tilemapTexture, 0, 0, rl.Color.white);
 
-        rl.drawTextureRec(tilemapTexture, tileset.getTileRect(.dirt), .{
+        rl.drawTextureRec(tilemapTexture, ts.getTileRect(.dirt), .{
             .x = 0,
             .y = 0,
         }, rl.Color.white);
