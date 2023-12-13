@@ -30,7 +30,7 @@ pub const Tile = enum(u8) {
     wall_inner_west_edge, //1, 1
     wall_south_west_edge, //1, 2
     wall_south_edge, //2, 2
-    wall_south_east_Edge, //2, 3
+    wall_south_east_edge, //2, 3
     dirt_stone_gravel, // 0, 2
     dirt_gravel, //0, 1
     dirt, //0, 0
@@ -44,15 +44,15 @@ pub fn getTileRect(tile: Tile) rl.Rectangle {
     var r = Rectangle{ .height = TileSize, .width = TileSize, .x = 0, .y = 0 };
     switch (tile) {
         .dirt, .empty => {},
-        .wall_north_west_edge => {
+        .wall_inner_north_west_edge => {
             r.x = 1;
             r.y = 0;
         },
-        .wall_south_facing => {
+        .Wall_inner_north => {
             r.x = 2;
             r.y = 0;
         },
-        .dirt_wall_top_right => {
+        .Wall_inner_east_edge => {
             r.x = 3;
             r.y = 0;
         },
@@ -60,15 +60,15 @@ pub fn getTileRect(tile: Tile) rl.Rectangle {
             r.x = 0;
             r.y = 1;
         },
-        .dirt_Wall_left => {
+        .wall_inner_west_edge => {
             r.x = 1;
             r.y = 1;
         },
-        .dirt_Wall => {
+        .wall_inner_north_east_edge => {
             r.x = 2;
             r.y = 1;
         },
-        .dirt_Wall_right => {
+        .wall_south_east_edge => {
             r.x = 2;
             r.y = 1;
         },
