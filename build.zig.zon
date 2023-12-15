@@ -1,6 +1,6 @@
 .{
-    .name = "ray",
-    .version = "0.0.0",
+    .name = "steno_game_lakebranch",
+    .version = "0.0.1",
 
     .dependencies = .{
         .raylib = .{
@@ -10,6 +10,8 @@
     },
 
     .paths = .{
-        "",
+        "build.zig",
+        "build.zig.zon",
+        "src",
     },
 }

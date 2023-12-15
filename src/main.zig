@@ -1,35 +1,75 @@
 // raylib-zig (c) Nikolas Wipper 2023
 const std = @import("std");
-const rl = @import("raylib");
 const ts = @import("dungeon_tileset.zig");
+const raylib = @import("raylib.zig");
+
+const tile_tags = std.ComptimeStringMap(ts.Tile, .{
+    .{ "f", .floor },
+    .{ "w", .wall },
+    .{ "e", .empty },
+});
+
+const State = struct {
+    tile_index_position: raylib.Vector2 = undefined,
+    tile: ?ts.Tile = null,
+    entropy: i16 = -1,
+};
+
+const TileStates = std.MultiArrayList(State);
+
 pub fn main() anyerror!void {
+    const mapWith = 2;
+    _ = mapWith;
+    const mapHeight = 2;
+    _ = mapHeight;
     // Initialization
     //--------------------------------------------------------------------------------------
     const screenWidth = 1920 / 2;
     const screenHeight = 1080 / 2;
     var gpa = std.heap.GeneralPurposeAllocator(.{}){};
-
     const alloc = gpa.allocator();
-
-    var canidates = try ts.getTileCandiates(alloc);
-
+    var tiles = TileStates{};
     defer {
-        ts.freeTileCanidatesMap(&canidates);
-        const leak = gpa.detectLeaks();
-        if (leak) {
-            std.debug.print("Leaked", .{});
-        }
-        _ = gpa.deinit();
+        const deinit_status = gpa.deinit();
+        //fail test; can't try in defer as defer is executed after we return
+        if (deinit_status == .leak) std.testing.expect(false) catch @panic("TEST FAIL");
     }
+    defer tiles.deinit(alloc);
+    // init grid map
+    // load in sample map
+    const buffer = try alloc.alloc(u8, 1024 * 2);
+    defer alloc.free(buffer);
+    const contents = try std.fs.cwd().readFile(
+        "assets/map_sample.csv",
+        buffer,
+    );
+    var lineItr = std.mem.splitAny(u8, contents, "\n\r");
+    // classify the tile to wall floor or empty, in order to deterimne if it is walkable or collidable
+    var x: f32 = 0;
+    var y: f32 = 0;
+    while (lineItr.next()) |line| {
+        var tokenItr = std.mem.splitAny(u8, line, ",");
+        defer y += 1;
+        while (tokenItr.next()) |token| {
+            defer x += 1;
+            if (token.len == 0) break;
+            const tile = tile_tags.get(token) orelse break;
+            try tiles.append(alloc, .{
+                .tile = tile,
+                .tile_index_position = .{ .x = x, .y = y },
+                .entropy = -1,
+            });
+        }
+    }
+    raylib.SetConfigFlags(raylib.FLAG_VSYNC_HINT);
+    raylib.InitWindow(screenWidth, screenHeight, "");
+    defer raylib.CloseWindow(); // Close window and OpenGL context
 
-    rl.initWindow(screenWidth, screenHeight, "raylib-zig [core] example - basic window");
-    defer rl.closeWindow(); // Close window and OpenGL context
-
-    rl.setTargetFPS(60); // Set our game to run at 60 frames-per-second
+    raylib.SetTargetFPS(60); // Set our game to run at 60 frames-per-second
     //--------------------------------------------------------------------------------------
-    var tilemapTexture = rl.loadTexture("assets/tilesets/tilemap_packed.png");
-    defer tilemapTexture.unload();
-    const camera: rl.Camera2D = .{ .offset = .{
+    const tilemapTexture = raylib.LoadTexture("assets/sample.png");
+    defer raylib.UnloadTexture(tilemapTexture);
+    const camera: raylib.Camera2D = .{ .offset = .{
         .x = 0,
         .y = 0,
     }, .rotation = 0, .target = .{
@@ -37,7 +77,9 @@ pub fn main() anyerror!void {
         .x = 0,
     }, .zoom = 3.0 };
     // Main game loop
-    while (!rl.windowShouldClose()) { // Detect window close button or ESC key
+    while (!raylib.WindowShouldClose()) { // Detect window close button or ESC key
+        defer raylib.ClearBackground(raylib.RAYWHITE);
+
         // Update
         //----------------------------------------------------------------------------------
         // TODO: Update your variables here
@@ -45,18 +87,12 @@ pub fn main() anyerror!void {
 
         // Draw
         //----------------------------------------------------------------------------------
-        rl.beginDrawing();
-        defer rl.endDrawing();
-        rl.beginMode2D(camera);
-        defer rl.endMode2D();
-        //rl.drawTexture(tilemapTexture, 0, 0, rl.Color.white);
+        raylib.BeginDrawing();
+        defer raylib.EndDrawing();
+        raylib.BeginMode2D(camera);
+        raylib.DrawTexture(tilemapTexture, 0, 0, raylib.WHITE);
 
-        rl.drawTextureRec(tilemapTexture, ts.getTileRect(.dirt), .{
-            .x = 0,
-            .y = 0,
-        }, rl.Color.white);
-
-        rl.clearBackground(rl.Color.white);
+        defer raylib.EndMode2D();
 
         //----------------------------------------------------------------------------------
     }
