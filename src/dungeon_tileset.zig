@@ -2,7 +2,7 @@ const rl = @import("raylib.zig");
 const std = @import("std");
 const ArrayList = std.ArrayList;
 const Rectangle = rl.Rectangle;
-pub const TileSize = 16;
+pub const TileSize: i32 = 16;
 
 pub const north: u8 = 0;
 pub const east: u8 = 1;
