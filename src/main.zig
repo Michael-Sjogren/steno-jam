@@ -113,7 +113,7 @@ pub fn main() anyerror!void {
         defer raylib.EndMode2D();
         //raylib.DrawTexture(tilemapTexture, 0, 0, raylib.WHITE);
         for (worldTiles) |tile| {
-            if (tile.tile_type == .empty) continue;
+            //if (tile.tile_type == .empty) continue;
             textureRectPos = wfc.indexToPositionV2(
                 tile.tile_id,
                 (width),

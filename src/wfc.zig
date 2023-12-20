@@ -1,5 +1,6 @@
 const std = @import("std");
 const raylib = @import("raylib.zig");
+const Rand = std.rand.Random;
 pub const WFC = @This();
 
 //
@@ -11,6 +12,7 @@ input: []WFCTile,
 wold_width: u32,
 world_height: u32,
 grid: []WFCTile,
+rng: Rand,
 
 pub const TileType = enum(u8) {
     empty,
@@ -32,16 +34,10 @@ pub const WFCTile = struct {
     possibleTiles: [4]?usize = .{ null, null, null, null },
     collapsed: bool = false,
     currentIndex: usize,
-
-    pub fn observe(self: *WFCTile) u8 {
-        _ = self;
-
-        return 0;
-    }
+    sample_id: usize,
 
     pub fn updateConstraints(
         self: *WFCTile,
-        tile: *WFCTile,
         width: u32,
         height: u32,
     ) void {
@@ -59,17 +55,9 @@ pub const WFCTile = struct {
             );
             y = @divFloor(
                 @as(u32, @bitCast(self.currentIndex)),
-                height,
+                width,
             );
 
-            x = @mod(
-                @as(u32, tile.currentIndex),
-                width,
-            );
-            y = @divFloor(
-                @as(u32, tile.currentIndex),
-                width,
-            );
             switch (n) {
                 0, 2, 4, 6, 8 => continue,
                 1 => {
@@ -86,10 +74,8 @@ pub const WFCTile = struct {
                 },
             }
             defer i += 1;
-            //const validGridTile = world_width >= x1 and x1 > 0 and world_height >= y1 and y1 > 0;
             if (width >= x and x > 0 and height >= y and y > 0) {
                 self.possibleTiles[i] = @intCast(x * y);
-                //world_tile.possibleTiles[i] = @intCast(x1 * y1);
             }
         }
     }
@@ -122,6 +108,28 @@ pub fn indexToPositionV2(index: usize, map_width: u32, tile_size: u32) raylib.Ve
 }
 
 // returns a final grid after it is done
-pub fn waveFunctionCollapse(self: *WFC) ![]Tile {
-    _ = self;
+pub fn waveFunctionCollapse(self: *WFC) ![]WFCTile {
+    // first select a random tile with the least entropy
+    var index = self.rng.intRangeAtMost(usize, 0, self.world_height * self.wold_width);
+    var sample_index = self.rng.intRangeAtMost(usize, 0, self.input_width * self.input_height);
+    var tile = self.grid[index];
+    tile.sample_id = sample_index;
+    tile.currentIndex = index;
+
+    while (!isAllCollapsed()) {
+        self.propagate(world_tile: *WFCTile)
+    }
+    // also select a random cell in the world
+
 }
+
+pub fn isAllCollapsed(self: *WFC) bool {
+    for (self.grid) |*tile| {
+        if (!tile.collapsed) {
+            return false;
+        }
+    }
+    return true;
+}
+
+test "test wfc" {}
