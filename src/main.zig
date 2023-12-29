@@ -5,7 +5,7 @@ const raylib = @import("raylib.zig");
 const Rectangle = raylib.Rectangle;
 const RndGen = std.rand.DefaultPrng;
 const TileSize = 16;
-
+const json = std.json;
 const tile_tags = std.ComptimeStringMap(wfc.Tile, .{
     .{ "F", .floor },
     .{ "W", .wall },
@@ -78,7 +78,7 @@ pub fn main() anyerror!void {
         tile.*.tile_id = @intCast((sample_width) * (sample_height));
     }
     // collapse
-    raylib.SetTargetFPS(60); // Set our game to run at 60 frames-per-second
+    raylib.SetTargetFPS(60); // Set our gafileme to run at 60 frames-per-second
     //--------------------------------------------------------------------------------------
     const camera: raylib.Camera2D = .{ .offset = .{
         .x = 0,
@@ -97,6 +97,8 @@ pub fn main() anyerror!void {
         .x = textureRectPos.x,
         .y = textureRectPos.y,
     };
+
+    try loadSampleData(alloc, "assets/samples/small-sample.tmj");
 
     while (!raylib.WindowShouldClose()) { // Detect window close button or ESC key
         defer raylib.ClearBackground(raylib.RAYWHITE);
@@ -130,4 +132,11 @@ pub fn main() anyerror!void {
         }
         //----------------------------------------------------------------------------------
     }
+}
+
+pub fn loadSampleData(alloc: anytype, path: []const u8) !void {
+    _ = path;
+    var parsed = try std.json.parseFromSlice(u8, alloc, sample_json, .{});
+    defer parsed.deinit();
+    std.log.debug("{}", .{parsed.value});
 }

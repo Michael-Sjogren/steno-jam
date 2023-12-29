@@ -110,15 +110,12 @@ pub fn indexToPositionV2(index: usize, map_width: u32, tile_size: u32) raylib.Ve
 // returns a final grid after it is done
 pub fn waveFunctionCollapse(self: *WFC) ![]WFCTile {
     // first select a random tile with the least entropy
-    var index = self.rng.intRangeAtMost(usize, 0, self.world_height * self.wold_width);
-    var sample_index = self.rng.intRangeAtMost(usize, 0, self.input_width * self.input_height);
+    const index = self.rng.intRangeAtMost(usize, 0, self.world_height * self.wold_width);
+    const sample_index = self.rng.intRangeAtMost(usize, 0, self.input_width * self.input_height);
     var tile = self.grid[index];
     tile.sample_id = sample_index;
     tile.currentIndex = index;
 
-    while (!isAllCollapsed()) {
-        self.propagate(world_tile: *WFCTile)
-    }
     // also select a random cell in the world
 
 }

@@ -1,0 +1,48 @@
+{ "compressionlevel":-1,
+ "height":9,
+ "infinite":false,
+ "layers":[
+        {
+         "data":[6, 6, 6, 6, 6, 6, 2684354590, 6,
+            6, 7, 8, 8, 8, 8, 9, 6,
+            6, 19, 20, 20, 20, 20, 21, 6,
+            1610612766, 19, 1610612794, 56, 57, 58, 21, 6,
+            6, 19, 1610612792, 48, 54, 2684354617, 21, 2684354590,
+            6, 19, 1610612793, 54, 54, 2684354616, 21, 6,
+            6, 19, 3221225530, 3221225529, 3221225528, 2684354618, 21, 6,
+            2684354590, 31, 32, 32, 32, 32, 33, 6,
+            6, 6, 6, 6, 6, 6, 6, 1610612766],
+         "height":9,
+         "id":1,
+         "name":"Tile Layer 1",
+         "opacity":1,
+         "type":"tilelayer",
+         "visible":true,
+         "width":8,
+         "x":0,
+         "y":0
+        }],
+ "nextlayerid":2,
+ "nextobjectid":1,
+ "orientation":"orthogonal",
+ "renderorder":"right-down",
+ "tiledversion":"1.10.2",
+ "tileheight":16,
+ "tilesets":[
+        {
+         "firstgid":1,
+         "source":"original_ts.tsj"
+        }, 
+        {
+         "firstgid":1,
+         "source":":\/automap-tiles.tsx"
+        }, 
+        {
+         "firstgid":6,
+         "source":"tileset-packed.tsj"
+        }],
+ "tilewidth":16,
+ "type":"map",
+ "version":"1.10",
+ "width":8
+}
