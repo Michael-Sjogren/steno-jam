@@ -12,7 +12,6 @@ const tile_tags = std.ComptimeStringMap(wfc.Tile, .{
     .{ "E", .empty },
 });
 
-
 /// TODO LIST
 ///
 /// The game must feature:
@@ -114,6 +113,37 @@ pub fn main() anyerror!void {
 }
 
 pub fn loadSampleData(alloc: anytype, path: []const u8) !void {
-    _ = alloc;
-    _ = path;
+    const Data = struct {
+        data: []u32,
+        height: u32 = 0,
+        width: u32 = 0,
+    };
+
+    const T = struct {
+        height: u32 = 0,
+        width: u32 = 0,
+        tilewidth: u32 = 0,
+        tileheight: u32 = 0,
+        layers: []Data,
+    };
+    const buffer = try alloc.alloc(u8, 1024 * 20);
+    defer alloc.free(buffer);
+    const contents = try std.fs.cwd().readFile(
+        path,
+        buffer,
+    );
+
+    var parser = try json.parseFromSlice(
+        T,
+        alloc,
+        contents,
+        .{ .ignore_unknown_fields = true },
+    );
+
+    for (parser.value.layers) |layerData| {
+        for (layerData.data) |id| {
+            std.log.debug("{d}", .{id});
+        }
+    }
+    defer parser.deinit();
 }
