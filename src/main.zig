@@ -12,6 +12,19 @@ const tile_tags = std.ComptimeStringMap(wfc.Tile, .{
     .{ "E", .empty },
 });
 
+
+/// TODO LIST
+///
+/// The game must feature:
+/// - [] multiple rooms containing either a door to the next floor, hostile entities, treasure, equiptment, and/or empty space
+/// - [] multiple floors consisting of rooms
+/// - [] difficulty increasing as the player ventures deeper incrementing the floor index
+/// - [] hostile entities that move between rooms
+/// - [] potions (or equivalent) to restore health
+/// - [] potions (or equivalent) to restore stamina and/or mana equivalent
+/// - [] a health system where damage varies based on equiptment currently in use
+/// - [] a companion (dog, fellow adventurer, or similar) which the player may recruit
+/// - [] permanent death (die and you start again) with persistance (can find their body from a previous run)
 pub fn main() anyerror!void {
 
     // Initialization
