@@ -74,9 +74,11 @@ pub const WFCTile = struct {
                 },
             }
             defer i += 1;
-            if (width >= x and x > 0 and height >= y and y > 0) {
-                self.possibleTiles[i] = @intCast(x * y);
-            }
+
+            y = @mod(y, height);
+            x = @mod(x, width);
+
+            self.possibleTiles[i] = @intCast(x * y);
         }
     }
 

@@ -6,11 +6,6 @@ const Rectangle = raylib.Rectangle;
 const RndGen = std.rand.DefaultPrng;
 const TileSize = 16;
 const json = std.json;
-const tile_tags = std.ComptimeStringMap(wfc.Tile, .{
-    .{ "F", .floor },
-    .{ "W", .wall },
-    .{ "E", .empty },
-});
 
 /// TODO LIST
 ///
@@ -75,44 +70,20 @@ pub fn main() anyerror!void {
         .y = textureRectPos.y,
     };
     _ = textureRect;
-
-    try loadSampleData(alloc, "assets/samples/small-sample.tmj");
+    const tile_ids = try loadSampleData(alloc, "assets/samples/small-sample.tmj");
+    std.debug.assert(sample_width * sample_height == tile_ids.len);
 
     while (!raylib.WindowShouldClose()) { // Detect window close button or ESC key
         defer raylib.ClearBackground(raylib.RAYWHITE);
-
-        // Update
-        //----------------------------------------------------------------------------------
-        // TODO: Update your variables here
-        //----------------------------------------------------------------------------------
-        // Draw
-        //----------------------------------------------------------------------------------
         raylib.BeginDrawing();
         defer raylib.EndDrawing();
         raylib.BeginMode2D(camera);
         defer raylib.EndMode2D();
         raylib.DrawTexture(sampleTilemapTexture, 0, 0, raylib.WHITE);
-        //for (worldTiles) |tile| {
-        //    //if (tile.tile_type == .empty) continue;
-        //    textureRectPos = wfc.indexToPositionV2(
-        //        tile.tile_id,
-        //        (width),
-        //        TileSize,
-        //    );
-        //    textureRect.x = textureRectPos.x;
-        //    textureRect.y = textureRectPos.y;
-        //    raylib.DrawTextureRec(
-        //        sampleTilemapTexture,
-        //        textureRect,
-        //        tile.position,
-        //        raylib.WHITE,
-        //    );
-        //}
-        ////----------------------------------------------------------------------------------
     }
 }
 
-pub fn loadSampleData(alloc: anytype, path: []const u8) !void {
+pub fn loadSampleData(alloc: anytype, path: []const u8) ![]u32 {
     const Data = struct {
         data: []u32,
         height: u32 = 0,
@@ -140,10 +111,7 @@ pub fn loadSampleData(alloc: anytype, path: []const u8) !void {
         .{ .ignore_unknown_fields = true },
     );
 
-    for (parser.value.layers) |layerData| {
-        for (layerData.data) |id| {
-            std.log.debug("{d}", .{id});
-        }
-    }
     defer parser.deinit();
+
+    return parser.value.layers[0].data;
 }
